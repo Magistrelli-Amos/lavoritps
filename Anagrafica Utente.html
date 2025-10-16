@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Anagrafica Utente con Generazione</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 500px;
+      margin: 40px auto;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 15px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #risultato {
+      margin-top: 20px;
+      font-weight: bold;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Anagrafica Utente</h2>
+
+  <form id="anagraficaForm">
+    <label>Nome:</label>
+    <input type="text" id="nome" required>
+
+    <label>Cognome:</label>
+    <input type="text" id="cognome" required>
+
+    <label>Indirizzo:</label>
+    <input type="text" id="indirizzo" required>
+
+    <label>Città:</label>
+    <input type="text" id="citta" required>
+
+    <label>CAP:</label>
+    <input type="text" id="cap" required pattern="[0-9]{5}" title="Inserisci un CAP valido (5 cifre)">
+
+    <label>Data di nascita:</label>
+    <input type="date" id="dataNascita" required>
+
+    <button type="button" onclick="calcolaGenerazione()">Invia</button>
+  </form>
+
+  <div id="risultato"></div>
+
+  <script>
+    function calcolaGenerazione() {
+      const nome = document.getElementById('nome').value.trim();
+      const cognome = document.getElementById('cognome').value.trim();
+      const indirizzo = document.getElementById('indirizzo').value.trim();
+      const citta = document.getElementById('citta').value.trim();
+      const cap = document.getElementById('cap').value.trim();
+      const dataNascita = document.getElementById('dataNascita').value;
+
+      if (!dataNascita) {
+        alert("Inserisci la data di nascita!");
+        return;
+      }
+
+      const anno = new Date(dataNascita).getFullYear();
+      const oggi = new Date();
+      const eta = oggi.getFullYear() - anno;
+
+      let generazione = "";
+
+      if (anno >= 2013) generazione = "Generazione Alpha";
+      else if (anno >= 1997) generazione = "Generazione Z";
+      else if (anno >= 1981) generazione = "Millennials";
+      else if (anno >= 1965) generazione = "Generazione X";
+      else if (anno >= 1946) generazione = "Baby Boomers";
+      else if (anno >= 1928) generazione = "Generazione Silenziosa";
+      else if (anno >= 1901) generazione = "Greatest Generation";
+      else generazione = "Generazione non classificata";
+
+      document.getElementById("risultato").innerHTML = `
+        <p><strong>Dati inseriti:</strong></p>
+        <p>Nome: ${nome} ${cognome}</p>
+        <p>Indirizzo: ${indirizzo}, ${cap} ${citta}</p>
+        <p>Età: ${eta} anni</p>
+        <p><strong>Appartiene alla: ${generazione}</strong></p>
+      `;
+    }
+  </script>
+
+</body>
+</html>
