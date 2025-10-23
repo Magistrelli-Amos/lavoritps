@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Convertitore Decimale → Binario</title>
+  <style>
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #059beb, #cfd9df);
+      color: #222;
+      text-align: center;
+      padding: 40px;
+    }
+
+    h2 {
+      color: #003366;
+      margin-bottom: 20px;
+    }
+
+    input[type="number"] {
+      width: 70px;
+      padding: 5px;
+      text-align: center;
+      border: 2px solid #ccc;
+      border-radius: 6px;
+      font-size: 1em;
+      margin: 5px;
+      transition: border-color 0.3s;
+    }
+
+    input[type="number"]:focus {
+      border-color: #007bff;
+      outline: none;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1em;
+      margin-top: 15px;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+      transform: scale(1.05);
+    }
+
+    #risultato {
+      margin-top: 25px;
+      font-family: "Courier New", monospace;
+      font-size: 1.1em;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 15px;
+      display: inline-block;
+      min-width: 300px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+
+    .errore {
+      color: #cc0000;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>Convertitore Decimale → Binario (4 Ottetti)</h2>
+  
+  <input type="number" id="num1" min="0" max="255" placeholder="0-255">
+  <input type="number" id="num2" min="0" max="255" placeholder="0-255">
+  <input type="number" id="num3" min="0" max="255" placeholder="0-255">
+  <input type="number" id="num4" min="0" max="255" placeholder="0-255">
+  
+  <br>
+  <button onclick="converti()">Converti in binario</button>
+  
+  <div id="risultato"></div>
+  
+  <script>
+    function converti() {
+      const numeri = [
+        document.getElementById('num1').value,
+        document.getElementById('num2').value,
+        document.getElementById('num3').value,
+        document.getElementById('num4').value
+      ];
+
+      const binari = [];
+
+      for (let i = 0; i < numeri.length; i++) {
+        const n = parseInt(numeri[i]);
+        if (isNaN(n) || n < 0 || n > 255) {
+          document.getElementById('risultato').innerHTML =
+            `<span class="errore">⚠️ Inserisci numeri validi (0–255) in tutte le caselle!</span>`;
+          return;
+        }
+
+        binari.push(n.toString(2).padStart(8, "0"));
+      }
+
+      document.getElementById('risultato').innerHTML = `
+        <strong>Indirizzo decimale:</strong> ${numeri.join('.')}<br>
+        <strong>Indirizzo binario:</strong> ${binari.join('.')}
+      `;
+    }
+  </script>
+</body>
+</html>
