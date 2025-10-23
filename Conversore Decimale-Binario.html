@@ -2,12 +2,12 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>Convertitore Decimale → Binario</title>
+  <title>Convertitore Decimale - Binario</title>
   <style>
 
     body {
       font-family: Arial, Helvetica, sans-serif;
-      background: linear-gradient(135deg, #059beb, #cfd9df);
+      background: linear-gradient(135deg, #059beb, #059beb);
       color: #222;
       text-align: center;
       padding: 40px;
@@ -73,7 +73,7 @@
 </head>
 
 <body>
-  <h2>Convertitore Decimale → Binario (4 Ottetti)</h2>
+  <h2>Convertitore Decimale - Binario (4 Ottetti)</h2>
   
   <input type="number" id="num1" min="0" max="255" placeholder="0-255">
   <input type="number" id="num2" min="0" max="255" placeholder="0-255">
@@ -100,7 +100,7 @@
         const n = parseInt(numeri[i]);
         if (isNaN(n) || n < 0 || n > 255) {
           document.getElementById('risultato').innerHTML =
-            `<span class="errore">⚠️ Inserisci numeri validi (0–255) in tutte le caselle!</span>`;
+            `<span class="errore">Inserisci numeri validi (0-255) in tutte le caselle!</span>`;
           return;
         }
 
