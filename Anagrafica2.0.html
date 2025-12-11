@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>anagrafica 2.0</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1>anagrafica 2.0</h1>
+
+    <div>
+        <h2>dati e informazioni personali</h2>
+        Nome:<br>
+        <input type="text" id="inputnome"><br>
+        Cognome:<br>
+        <input type="text" id="inputcognome"><br>
+        <div>
+        <h2>Luogo di residenza</h2>
+        Regione:<br>
+        <select id="regione" onchange="caricaProvince()">
+            <option value="">seleziona regione</option>
+            <option value="Lombardia">Lombardia</option>
+            <option value="Sardegna">Sardegna</option>
+            <option value="Sicilia">Sicilia</option>
+            <option value="Veneto">Veneto</option>
+        </select><br>
+        Provincia:<br>
+        <select id="provincia">
+            <option value="">seleziona provincia</option>
+        </select>
+    </div>
+
+        Indirizzo:<br>
+        <input type="text" id="inputindirizzo"><br>
+        Anno di nascita:<br>
+        <input type="number" id="inputnascita" min="1900" max="2025"><br>
+        <p id="generazione"></p>
+        <p id="eta"></p>
+    </div>
+
+    <div>
+        <h2>Genere</h2>
+        <input type="radio" name="genere" value="Femmina"> Femmina<br>
+        <input type="radio" name="genere" value="Maschio"> Maschio<br>
+        <input type="radio" name="genere" value="Altro"> Altro<br>
+    </div>
+
+    <div>
+        <h2>Mezzi posseduti</h2>
+        <input type="checkbox" class="mezzo" value="Bicicletta"> Bicicletta<br>
+        <input type="checkbox" class="mezzo" value="Automobile"> Automobile<br>
+        <input type="checkbox" class="mezzo" value="Barca"> Barca<br>
+        <input type="checkbox" class="mezzo" value="Moto"> Moto<br>
+    </div>
+
+    <div>
+        <h2>Sport</h2>
+        <select id="sport" multiple style="height:120px; width:150px;">
+            <option>Atletica</option>
+            <option>Pallavolo</option>
+            <option>Nuoto</option>
+            <option>Calcio</option>
+            <option>Tennis</option>
+            <option>Equitazione</option>
+            <option>Danza</option>
+            <option>Arti Marziali</option>
+        </select>
+    </div>
+
+    <br>
+    <button onclick="verifica()">VERIFICA</button>
+
+    <div>
+        <h2>RISULTATI COMPLETI</h2>
+        <pre id="risultati"></pre>
+    </div>
+
+<script>
+
+    var province = {
+        "Lombardia": ["Milano","Bergamo","Brescia","Como", "Cremona", "Lecco","Lodi","Mantova","Pavia","Sondrio","Varese"],
+        "Veneto": ["Venezia","Padova","Verona","Vicenza","Belluno","Rovigo","Treviso"],
+        "Sicilia": ["Palermo","Catania","Messina","Trapani", "Agrigento", "Caltanissetta", "Enna", "Siracusa", "Ragusa"],
+        "Sardegna": ["Cagliari", "Nuoro", "Oristano", "Sassari", "Sud Sardegna"],
+    };
+
+    function caricaProvince() {
+        var regione = document.getElementById("regione").value;
+        var provincia = document.getElementById("provincia");
+
+        provincia.innerHTML = "<option> seleziona provincia </option>";
+
+        if (province[regione]) {
+            var optionsHTML = "";
+            for (var i=0; i<province[regione].length; i++) {
+                optionsHTML += "<option value='" + province[regione][i] + "'>" + province[regione][i] + "</option>";
+            }
+            provincia.innerHTML += optionsHTML;
+        }
+    }
+
+    function trovaGenerazione(anno) {
+        if (anno >= 1946 && anno <= 1964) return "Baby Boomers";
+        if (anno >= 1965 && anno <= 1980) return "Generazione X";
+        if (anno >= 1981 && anno <= 1996) return "Millennials";
+        if (anno >= 1997 && anno <= 2012) return "Generazione Z";
+        if (anno >= 2013) return "Generazione Alpha";
+        return "Anno non valido";
+    }
+
+    function verifica() {
+        var nome = document.getElementById("inputnome").value;
+        var cognome = document.getElementById("inputcognome").value;
+        var indirizzo = document.getElementById("inputindirizzo").value;
+        var anno = parseInt(document.getElementById("inputnascita").value);
+
+        var genere = document.querySelector('input[name="genere"]:checked');
+        var reg = document.getElementById("regione").value;
+        var prov = document.getElementById("provincia").value;
+
+        var mezziSel = [];
+        var mezzi = document.getElementsByClassName("mezzo");
+        for (var i=0; i<mezzi.length; i++) {
+            if (mezzi[i].checked) {
+                mezziSel.push(mezzi[i].value);
+            }
+        }
+
+        var sportSel = [];
+        var sportOptions = document.getElementById("sport").options;
+        for (var i=0; i<sportOptions.length; i++) {
+            if (sportOptions[i].selected) {
+                sportSel.push(sportOptions[i].value);
+            }
+        }
+
+        var generazione = !isNaN(anno) ? trovaGenerazione(anno) : "-";
+        var eta = !isNaN(anno) ? new Date().getFullYear() - anno : "-";
+
+        var risultatoTesto = 
+        "Nome: " + nome + "\n" +
+        "Cognome: " + cognome + "\n" +
+        "Regione: " + (reg || "-") + "\n" +
+        "Provincia: " + (prov || "-") + "\n" +
+        "Indirizzo: " + indirizzo + "\n" +
+        "Anno di nascita: " + anno + "\n" +
+        "Generazione: " + generazione + "\n" +
+        "Età: " + eta + " anni\n" +
+        "Genere: " + (genere ? genere.value : "-") + "\n" +
+        "Mezzi: " + (mezziSel.length ? mezziSel.join(", ") : "-") + "\n" +
+        "Sport: " + (sportSel.length ? sportSel.join(", ") : "-");
+
+        document.getElementById("risultati").textContent = risultatoTesto;
+
+        document.getElementById("generazione").textContent = "Generazione: " + generazione;
+        document.getElementById("eta").textContent = "Età: " + eta + " anni";
+    }
+</script>
+
+</body>
+</html>
