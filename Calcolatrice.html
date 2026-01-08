@@ -4,8 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Calcolatrice Funzionante</title>
-
-  <!-- CSS incluso per avere display grande e pulsanti leggibili -->
+  
   <style>
     body {
       display: flex;
@@ -71,10 +70,8 @@
 <body>
 
 <div class="calculator">
-  <!-- Display per mostrare l'espressione corrente -->
   <input type="text" id="display" readonly placeholder="0">
 
-  <!-- Pulsanti della calcolatrice -->
   <div class="buttons">
     <button class="clear" onclick="clearDisplay()">C</button>
     <button onclick="appendToDisplay('(')">(</button>
@@ -105,9 +102,8 @@
 <script>
   const displayElement = document.getElementById("display");
 
-  // Funzione per aggiungere caratteri al display
   function appendToDisplay(value) {
-    // Se è vuoto, sostituisce il placeholder
+    
     if (displayElement.value === "" && value === ".") {
       displayElement.value = "0.";
     } else {
@@ -115,18 +111,15 @@
     }
   }
 
-  // Funzione per cancellare tutto
   function clearDisplay() {
     displayElement.value = "";
   }
 
-  // Funzione per calcolare il risultato in modo semplice
   function computeResult() {
     try {
-      // Usare la funzione costruita, non eval()
+      
       const expression = displayElement.value;
 
-      // Semplice parser di base per * / + - con parentesi
       const result = Function('"use strict"; return (' + expression + ')')();
       displayElement.value = result;
     } catch (error) {
