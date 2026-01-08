@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Calcolatrice</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f4f4f4;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+
+    .calculator {
+      background-color: #2b2b2b;
+      padding: 15px;
+      border-radius: 10px;
+      width: 320px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+    }
+
+    #display {
+      width: 100%;
+      height: 60px;
+      background: transparent;
+      color: white;
+      border: none;
+      font-size: 2.2rem;
+      text-align: right;
+      padding: 10px;
+      box-sizing: border-box;
+      margin-bottom: 10px;
+      outline: none;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-gap: 6px;
+    }
+
+    button {
+      height: 55px;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      background-color: #3b3b3b;
+      color: white;
+      transition: background 0.1s;
+    }
+
+    button:hover { background-color: #4a4a4a; }
+    button:active { background-color: #555; }
+    .number { background-color: #1f1f1f; font-weight: bold; }
+    .operator { background-color: #ff9500; color: white; }
+    .operator:hover { background-color: #e68600; }
+    .func { background-color: #505050; }
+    .clear { background-color: #ff3b30; }
+    .equals { background-color: #4CAF50; grid-column: span 2; }
+  </style>
+</head>
+<body>
+
+<div class="calculator">
+  <input type="text" id="display" readonly value="0">
+  
+  <div class="grid">
+    <button class="func" onclick="mathOp('pi')">π</button>
+    <button class="func" onclick="append('**')">^</button>
+    <button class="func" onclick="mathOp('percent')">%</button>
+    <button class="clear" onclick="clearLast()">C</button>
+
+    <button class="func" onclick="mathOp('sin')">sin</button>
+    <button class="func" onclick="mathOp('cos')">cos</button>
+    <button class="func" onclick="mathOp('tan')">tan</button>
+    <button class="operator" onclick="append('/')">÷</button>
+
+    <button class="number" onclick="append('7')">7</button>
+    <button class="number" onclick="append('8')">8</button>
+    <button class="number" onclick="append('9')">9</button>
+    <button class="operator" onclick="append('*')">×</button>
+
+    <button class="number" onclick="append('4')">4</button>
+    <button class="number" onclick="append('5')">5</button>
+    <button class="number" onclick="append('6')">6</button>
+    <button class="operator" onclick="append('-')">−</button>
+
+    <button class="number" onclick="append('1')">1</button>
+    <button class="number" onclick="append('2')">2</button>
+    <button class="number" onclick="append('3')">3</button>
+    <button class="operator" onclick="append('+')">+</button>
+
+    <button class="func" onclick="mathOp('sqrt')">√</button>
+    <button class="number" onclick="append('0')">0</button>
+    <button class="equals" onclick="calculate()">=</button>
+  </div>
+</div>
+
+<script>
+  const display = document.getElementById("display");
+
+  function append(char) {
+    if (display.value === "0" || display.value === "Errore") {
+      display.value = (char === '**') ? '0**' : char;
+    } else {
+      display.value += char;
+    }
+  }
+
+  function clearLast() {
+    if (display.value.length > 1 && display.value !== "Errore") {
+      display.value = display.value.slice(0, -1);
+    } else {
+      display.value = "0";
+    }
+  }
+
+  function mathOp(type) {
+    let val = parseFloat(display.value);
+    let res;
+    
+    switch(type) {
+      case 'pi': 
+        if(display.value === "0") display.value = Math.PI.toFixed(8);
+        else append(Math.PI.toFixed(8));
+        return;
+      case 'percent': res = val / 100; break;
+      case 'sqrt': res = Math.sqrt(val); break;
+      case 'sin': res = Math.sin(val * Math.PI / 180); break;
+      case 'cos': res = Math.cos(val * Math.PI / 180); break;
+      case 'tan': res = Math.tan(val * Math.PI / 180); break;
+    }
+    display.value = Number(res.toFixed(8)).toString();
+  }
+
+  function calculate() {
+    try {
+      const expr = display.value;
+      const cleanExpr = expr.replace(/[^-+*/0-9.]/g, (m) => expr.includes('**') ? m : '');
+
+      const result = new Function('return ' + cleanExpr)();
+      display.value = Number(result.toFixed(8)).toString();
+    } catch (e) {
+      display.value = "Errore";
+    }
+  }
+</script>
+
+</body>
+</html>
