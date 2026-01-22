@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Esercizio Array di Oggetti</title>
+    <style>
+        body {
+            background-color: #10d7ff;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        .contenitore {
+            background-color: rgb(248, 252, 252);
+            border: 2px solid #f01515;
+            padding: 20px;
+            width: 400px;
+            border-radius: 10px;
+        }
+
+        h2 {
+            color: #e8f406;
+        }
+
+        input {
+            margin-bottom: 10px;
+            display: block;
+            width: 90%;
+            padding: 5px;
+        }
+
+        button {
+            background-color: #ec7505;
+            color: rgb(250, 255, 255);
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #ff2929;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ffc001;
+        }
+
+        th {
+            background-color: #ea0808;
+            padding: 8px;
+        }
+
+        td {
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="contenitore">
+        <h2>Inserisci Dati</h2>
+        
+        <input type="text" id="campoNome" placeholder="Nome">
+        <input type="text" id="campoCognome" placeholder="Cognome">
+        <input type="text" id="campoEmail" placeholder="Email">
+        <input type="text" id="campoCittà" placeholder="Città">
+
+        <button onclick="salvaDati()">Invia Dati</button>
+    </div>
+
+    <h2>Tabella Risultati</h2>
+    <table id="tabellaDati">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Cognome</th>
+                <th>Email</th>
+                <th>Città</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script>
+        var elencoDati = [];
+
+        function salvaDati() {
+            var nome = document.getElementById("campoNome").value;
+            var cognome = document.getElementById("campoCognome").value;
+            var email = document.getElementById("campoEmail").value;
+            var città = document.getElementById("campoCittà").value;
+
+            if (nome == "" || cognome == "") {
+                alert("Riempi almeno Nome e Cognome!");
+                return;
+            }
+
+            var nuovoOggetto = {
+                n: nome,
+                c: cognome,
+                e: email,
+                cit: città
+            };
+
+            elencoDati.push(nuovoOggetto);
+
+            document.getElementById("campoNome").value = "";
+            document.getElementById("campoCognome").value = "";
+            document.getElementById("campoEmail").value = "";
+            document.getElementById("campoCittà").value = "";
+
+            mostraTabella();
+        }
+
+        function mostraTabella() {
+            var corpoTabella = document.getElementById("tabellaDati").getElementsByTagName('tbody')[0];
+            
+            corpoTabella.innerHTML = "";
+
+            for (var i = 0; i < elencoDati.length; i++) {
+                var riga = corpoTabella.insertRow();
+                
+                var cella1 = riga.insertCell(0);
+                var cella2 = riga.insertCell(1);
+                var cella3 = riga.insertCell(2);
+                var cella4 = riga.insertCell(3);
+
+                cella1.innerHTML = elencoDati[i].n;
+                cella2.innerHTML = elencoDati[i].c;
+                cella3.innerHTML = elencoDati[i].e;
+                cella4.innerHTML = elencoDati[i].cit;
+            }
+        }
+    </script>
+
+</body>
+</html>
