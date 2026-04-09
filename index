@@ -1,1 +1,210 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lavori</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+      :root {
+        --bg: #d5afe9;
+        --surface: rgba(255,255,255,0.45);
+        --border: rgba(255,255,255,0.5);
+        --border-hover: rgba(255,255,255,0.85);
+        --text-primary: #1e0f33;
+        --text-secondary: #5c3d80;
+        --accent: #4b0082;
+      }
+
+      body {
+        background-color: var(--bg);
+        font-family: 'Inter', sans-serif;
+        font-weight: 400;
+        color: var(--text-primary);
+        min-height: 100vh;
+        padding: 80px 24px 100px;
+        transition: background-color 1.4s ease;
+      }
+
+      body.shiny {
+        --bg: #64ccf3;
+        --surface: rgba(255,255,255,0.45);
+        --border: rgba(255,255,255,0.5);
+        --border-hover: rgba(255,255,255,0.85);
+        --text-primary: #002f44;
+        --text-secondary: #1a6a8a;
+        --accent: #004e72;
+      }
+
+      .flash {
+        position: fixed; inset: 0;
+        background: white; opacity: 0;
+        pointer-events: none; z-index: 999;
+      }
+      .flash.active { animation: flash 0.8s ease forwards; }
+      @keyframes flash {
+        0%   { opacity: 0; }
+        15%  { opacity: 0.85; }
+        40%  { opacity: 0; }
+        55%  { opacity: 0.4; }
+        100% { opacity: 0; }
+      }
+
+      .container {
+        max-width: 520px;
+        margin: 0 auto;
+      }
+
+      header {
+        margin-bottom: 48px;
+      }
+
+      .wordmark {
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+      }
+
+      .divider {
+        width: 32px;
+        height: 1px;
+        background: var(--text-secondary);
+        opacity: 0.35;
+        margin: 20px 0;
+      }
+
+      .section-label {
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+        margin-bottom: 20px;
+      }
+
+      .list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .list-item a {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 18px;
+        background: var(--surface);
+        border: 0.5px solid var(--border);
+        border-radius: 10px;
+        text-decoration: none;
+        color: var(--text-primary);
+        font-size: 14px;
+        font-weight: 400;
+        backdrop-filter: blur(6px);
+        transition: border-color 0.15s, transform 0.15s, background 0.15s;
+      }
+
+      .list-item a:hover {
+        border-color: var(--border-hover);
+        background: rgba(255,255,255,0.6);
+        transform: translateX(3px);
+      }
+
+      .item-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .item-dot {
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: var(--text-secondary);
+        opacity: 0.5;
+        flex-shrink: 0;
+        transition: opacity 0.15s, background 0.15s;
+      }
+
+      .list-item a:hover .item-dot {
+        opacity: 1;
+        background: var(--accent);
+      }
+
+      .item-arrow {
+        font-size: 13px;
+        color: var(--text-secondary);
+        opacity: 0;
+        transition: opacity 0.15s, transform 0.15s;
+      }
+
+      .list-item a:hover .item-arrow {
+        opacity: 1;
+        transform: translateX(2px);
+      }
+
+      .list-item.wip a { opacity: 0.4; }
+
+      footer {
+        margin-top: 64px;
+        font-size: 11px;
+        color: var(--text-secondary);
+        opacity: 0.6;
+        letter-spacing: 0.08em;
+      }
+
+      @media (max-width: 480px) {
+        body { padding: 48px 16px 80px; }
+        .list-item a { padding: 13px 14px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="flash" id="flash"></div>
+
+    <div class="container">
+      <header>
+        <div class="wordmark">Lavori</div>
+        <div class="divider"></div>
+        <div class="section-label">Projects</div>
+      </header>
+
+      <ul class="list">
+        <li class="list-item"><a href="Anagrafica Utente.html><div class="item-left"><span class="item-dot"></span><span>Anagrafica 1.0</span></div><span class="item-arrow">→</span></a></li>
+        <li class="list-item"><a href="Anagrafica2.0.html"><div class="item-left"><span class="item-dot"></span><span>Anagrafica 1.1</span></div><span class="item-arrow">→</span></a></li>
+        <li class="list-item"><a href="anagrafica_3.0.html><div class="item-left"><span class="item-dot"></span><span>Anagrafica 2.0</span></div><span class="item-arrow">→</span></a></li>
+        <li class="list-item"><a href="https://alextygh.github.io/lavori/anagrafica_3.0.html"><div class="item-left"><span class="item-dot"></span><span>Anagrafica 3.0</span></div><span class="item-arrow">→</span></a></li>
+        <li class="list-item"><a href="https://alextygh.github.io/lavori/anagrafica_5.0.html"><div class="item-left"><span class="item-dot"></span><span>Anagrafica 5.0</span></div><span class="item-arrow">→</span></a></li>
+        <li class="list-item"><a href="https://alextygh.github.io/lavori/calcolatrice/calc.html"><div class="item-left"><span class="item-dot"></span><span>Calcolatrice</span></div><span class="item-arrow">→</span></a></li>
+        <li class="list-item"><a href="https://alextygh.github.io/lavori/character-questionnaire-it.html"><div class="item-left"><span class="item-dot"></span><span>Character Questionnaire</span></div><span class="item-arrow">→</span></a></li>
+        <li class="list-item"><a href="https://chegg-game.netlify.app"><div class="item-left"><span class="item-dot"></span><span>CHEGG</span></div><span class="item-arrow">→</span></a></li>
+        <li class="list-item"><a href="https://alextygh.github.io/lavori/index (1).html"><div class="item-left"><span class="item-dot"></span><span>Convertitore Decimale</span></div><span class="item-arrow">→</span></a></li>
+        <li class="list-item"><a href="https://alextygh.github.io/lavori/google.html"><div class="item-left"><span class="item-dot"></span><span>Google</span></div><span class="item-arrow">→</span></a></li>
+        <li class="list-item"><a href="https://alextygh.github.io/lavori/Louie's Recipes/index.html"><div class="item-left"><span class="item-dot"></span><span>Louie's Cookbook</span></div><span class="item-arrow">→</span></a></li>
+        <li class="list-item"><a href="https://alextygh.github.io/lavori/passaggi.html"><div class="item-left"><span class="item-dot"></span><span>Passaggi</span></div><span class="item-arrow">→</span></a></li>
+        <li class="list-item"><a href="https://alextygh.github.io/lavori/Game/pokemon.html"><div class="item-left"><span class="item-dot"></span><span>Pokémon</span></div><span class="item-arrow">→</span></a></li>
+        <li class="list-item"><a href="https://alextygh.github.io/lavori/Skylandex/index.html"><div class="item-left"><span class="item-dot"></span><span>Skylandex</span></div><span class="item-arrow">→</span></a></li>
+        <li class="list-item"><a href="https://alextygh.github.io/lavori/subnet_binaria.html"><div class="item-left"><span class="item-dot"></span><span>Subnet Binaria</span></div><span class="item-arrow">→</span></a></li>
+        <li class="list-item"><a href="https://alextygh.github.io/lavori/subnet_mask_host.html"><div class="item-left"><span class="item-dot"></span><span>Subnet Binaria Host</span></div><span class="item-arrow">→</span></a></li>
+        <li class="list-item wip"><a href="https://alextygh.github.io/lavori/test.html"><div class="item-left"><span class="item-dot"></span><span>Test</span></div><span class="item-arrow">→</span></a></li>
+      </ul>
+
+      <footer>alextygh · github.io</footer>
+    </div>
+
+    <script>
+      if (Math.random() < 1 / 4096) {
+        const flash = document.getElementById('flash');
+        flash.classList.add('active');
+        setTimeout(() => {
+          document.body.classList.add('shiny');
+          flash.classList.remove('active');
+        }, 420);
+      }
+    </script>
+  </body>
+</html>
