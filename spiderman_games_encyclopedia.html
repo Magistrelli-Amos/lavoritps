@@ -1,0 +1,402 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.hero{padding:2.5rem 1.5rem 1.5rem;text-align:center;border-bottom:0.5px solid var(--color-border-tertiary)}
+.hero h1{font-size:28px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px}
+.hero p{font-size:14px;color:var(--color-text-secondary)}
+.filters{display:flex;flex-wrap:wrap;gap:8px;padding:1rem 1.5rem;border-bottom:0.5px solid var(--color-border-tertiary)}
+.era-btn{font-size:12px;padding:5px 14px;border-radius:20px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-secondary);cursor:pointer;transition:all 0.15s}
+.era-btn.active{background:#C01B23;color:#fff;border-color:#C01B23}
+.counter{font-size:12px;color:var(--color-text-secondary);padding:0.6rem 1.5rem;border-bottom:0.5px solid var(--color-border-tertiary)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;padding:1.5rem}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:12px;overflow:hidden;transition:border-color 0.15s}
+.card:hover{border-color:var(--color-border-secondary)}
+.card-img{width:100%;height:170px;object-fit:cover;display:block;background:var(--color-background-secondary)}
+.card-img-placeholder{width:100%;height:170px;background:var(--color-background-tertiary);display:flex;align-items:center;justify-content:center;font-size:40px}
+.card-body{padding:1rem}
+.card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px}
+.card-title{font-size:14px;font-weight:500;color:var(--color-text-primary);line-height:1.4}
+.year-badge{font-size:11px;font-weight:500;padding:3px 8px;border-radius:20px;background:#FEE2E3;color:#A32D2D;white-space:nowrap;flex-shrink:0}
+.platform-badge{font-size:11px;padding:2px 8px;border-radius:20px;background:var(--color-background-secondary);color:var(--color-text-secondary);border:0.5px solid var(--color-border-tertiary);margin-bottom:8px;display:inline-block}
+.expand-btn{font-size:12px;color:#C01B23;cursor:pointer;background:none;border:none;padding:0;margin-top:6px}
+.details{display:none;margin-top:10px;border-top:0.5px solid var(--color-border-tertiary);padding-top:10px}
+.details.open{display:block}
+.detail-section{margin-bottom:8px}
+.detail-label{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:3px}
+.detail-text{font-size:13px;color:var(--color-text-primary);line-height:1.6}
+</style>
+
+<div class="hero">
+  <h1>🕷 Spider-Man Games Encyclopedia</h1>
+  <p>Every Spider-Man video game from 1982 to 2023 — 33 games across 4 decades</p>
+</div>
+
+<div class="filters">
+  <button class="era-btn active" onclick="filterEra('all',this)">All (33)</button>
+  <button class="era-btn" onclick="filterEra('80s',this)">1980s (3)</button>
+  <button class="era-btn" onclick="filterEra('90s',this)">1990s (12)</button>
+  <button class="era-btn" onclick="filterEra('00s',this)">2000s (11)</button>
+  <button class="era-btn" onclick="filterEra('10s',this)">2010s (5)</button>
+  <button class="era-btn" onclick="filterEra('20s',this)">2020s (2)</button>
+</div>
+<div class="counter" id="counter">Showing 33 games</div>
+
+<div class="grid" id="grid"></div>
+
+<script>
+const games = [
+  {
+    id:1, year:1982, era:'80s',
+    title:'Spider-Man',
+    platform:'Atari 2600',
+    img:'https://www.gamingscan.com/wp-content/uploads/2020/09/Spider-Man.jpg',
+    plot:'The Green Goblin has planted bombs across a skyscraper. Spider-Man must scale the building, defuse them, and reach the villain at the top before time runs out.',
+    gameplay:'A vertical climbing game where players web-swing up a building, dodge criminals and supervillains, and disarm bombs. Web fluid is limited — managing it is key.',
+    cast:'No voice cast. Developed by Parker Brothers.'
+  },
+  {
+    id:2, year:1984, era:'80s',
+    title:'Questprobe: Spider-Man',
+    platform:'Apple II / C64 / PC',
+    img:'https://www.gamingscan.com/wp-content/uploads/2020/09/Questprobe-Spider-Man.jpg',
+    plot:'The Chief Examiner abducts Spider-Man and traps him in a series of puzzle-filled environments to test his problem-solving abilities.',
+    gameplay:'A text adventure with graphic panels. Players type commands to interact with objects and characters, solving inventory-based puzzles across Marvel-themed rooms.',
+    cast:'No voice cast. Developed by Adventure International with Marvel Comics.'
+  },
+  {
+    id:3, year:1989, era:'80s',
+    title:'Spider-Man and Captain America in Doctor Doom\'s Revenge',
+    platform:'PC / Amiga / Atari ST',
+    img:'https://www.gamingscan.com/wp-content/uploads/2020/09/Spider-Man-and-Captain-America-in-Doctor-Dooms-Revenge.jpg',
+    plot:'Doctor Doom has acquired a nuclear missile and threatens global destruction. Spider-Man and Captain America must fight through waves of supervillains to stop him.',
+    gameplay:'A side-scrolling beat-\'em-up where players choose between Spider-Man and Captain America, battling villains like Electro, Rhino, and Batroc across multiple stages.',
+    cast:'No voice cast. Developed by Paragon Software.'
+  },
+  {
+    id:4, year:1990, era:'90s',
+    title:'The Amazing Spider-Man',
+    platform:'NES / PC / Amiga',
+    img:'https://www.gamingscan.com/wp-content/uploads/2020/09/The-Amazing-Spider-Man.jpg',
+    plot:'Mary Jane has been kidnapped by the Kingpin, who has also captured several other heroes. Spider-Man must rescue them and dismantle the criminal empire.',
+    gameplay:'A side-scrolling action game with both wall-crawling and web-swinging. Players fight through levels themed around New York locations, using webs as both weapon and traversal.',
+    cast:'No voice cast. Developed by Rare, published by LJN.'
+  },
+  {
+    id:5, year:1990, era:'90s',
+    title:'The Amazing Spider-Man (Game Boy)',
+    platform:'Game Boy',
+    img:'https://www.gamingscan.com/wp-content/uploads/2020/09/The-Amazing-Spider-Man-Game-Boy.jpg',
+    plot:'Spider-Man must rescue Mary Jane and other captives from a series of villain-controlled lairs, ultimately confronting the Lizard as the final boss.',
+    gameplay:'A top-down action-adventure. Players explore mazes, collect items, and battle enemies. Web-slinging and wall-crawling mechanics are adapted to the handheld\'s small screen.',
+    cast:'No voice cast. Developed by Bits Studios, published by LJN.'
+  },
+  {
+    id:6, year:1991, era:'90s',
+    title:'The Amazing Spider-Man vs. The Kingpin',
+    platform:'Sega Genesis / Mega Drive / Sega CD',
+    img:'https://www.gamingscan.com/wp-content/uploads/2020/09/The-Amazing-Spider-Man-vs-The-Kingpin.jpg',
+    plot:'The Kingpin frames Spider-Man for planting a bomb set to destroy New York City. Spidey has 24 hours to defeat six villains, collect keys, and prove his innocence.',
+    gameplay:'An open-world side-scroller with a ticking clock mechanic. Players swing through NYC, battle iconic rogues gallery members, and collect items to disarm the bomb.',
+    cast:'No voice cast. Developed and published by Sega.'
+  },
+  {
+    id:7, year:1992, era:'90s',
+    title:'The Amazing Spider-Man 2',
+    platform:'Game Boy',
+    img:'https://www.gamingscan.com/wp-content/uploads/2020/09/The-Amazing-Spider-Man-2.jpg',
+    plot:'The Kingpin returns, this time orchestrating a crime wave across the city. Spider-Man must battle new villains and ultimately defeat the Kingpin once more.',
+    gameplay:'A side-scrolling action game improving on the first Game Boy entry, with better controls, new power-ups, and more varied level design.',
+    cast:'No voice cast. Developed by Bits Studios, published by LJN.'
+  },
+  {
+    id:8, year:1992, era:'90s',
+    title:'Spider-Man: Return of the Sinister Six',
+    platform:'NES / Game Gear / Master System',
+    img:'https://www.gamingscan.com/wp-content/uploads/2020/09/Spider-Man-Return-Of-The-Sinister-Six.jpg',
+    plot:'Doctor Octopus reassembles the Sinister Six — Electro, Sandman, Mysterio, Vulture, and Hobgoblin — to take over the world. Spider-Man must face each in turn.',
+    gameplay:'A linear side-scroller where each stage culminates in a Sinister Six boss fight. Special web cartridges must be collected to harm certain enemies.',
+    cast:'No voice cast. Developed by Flying Edge, published by LJN.'
+  },
+  {
+    id:9, year:1992, era:'90s',
+    title:'Spider-Man and the X-Men in Arcade\'s Revenge',
+    platform:'SNES / Genesis / Game Boy / Game Gear',
+    img:'https://www.gamingscan.com/wp-content/uploads/2020/09/Spider-Man-And-The-X-Men-In-Arcades-Revenge.jpg',
+    plot:'The villain Arcade kidnaps the X-Men and traps them in deadly theme-park murder machines. Spider-Man must rescue Cyclops, Storm, Wolverine, and Gambit.',
+    gameplay:'A platformer featuring five playable characters, each with unique abilities. Players alternate between Spider-Man\'s stages and the X-Men\'s distinct themed levels.',
+    cast:'No voice cast. Developed by Software Creations, published by LJN/Acclaim.'
+  },
+  {
+    id:10, year:1993, era:'90s',
+    title:'The Amazing Spider-Man 3: Invasion of the Spider Slayers',
+    platform:'Game Boy',
+    img:'https://www.gamingscan.com/wp-content/uploads/2020/09/The-Amazing-Spider-Man-3-Invasion-of-the-Spider-Slayers.jpg',
+    plot:'Spencer Smythe unleashes a new wave of Spider-Slayer robots on New York. Spider-Man battles through waves of mechanical hunters to shut down Smythe\'s operation.',
+    gameplay:'A side-scrolling action game with multiple Spider-Slayer boss encounters. The game features improved sprites and tighter controls over its predecessors.',
+    cast:'No voice cast. Developed by Bits Studios, published by LJN.'
+  },
+  {
+    id:11, year:1994, era:'90s',
+    title:'The Amazing Spider-Man: Lethal Foes',
+    platform:'SNES / Super Famicom',
+    img:'https://www.gamingscan.com/wp-content/uploads/2020/09/The-Amazing-Spider-Man-Lethal-Foes.jpg',
+    plot:'A Japan-exclusive adventure where Spider-Man battles an alliance of supervillains including Tri-Sentinel, Doctor Octopus, Venom, and Carnage threatening New York.',
+    gameplay:'An action-platformer with RPG elements. Spider-Man can use different web types and gains upgrades. Features multiple endings depending on player choices and performance.',
+    cast:'No voice cast. Developed by Software Creations, published by Bec.'
+  },
+  {
+    id:12, year:1994, era:'90s',
+    title:'Spider-Man and Venom: Maximum Carnage',
+    platform:'SNES / Sega Genesis',
+    img:'https://www.gamingscan.com/wp-content/uploads/2020/09/Spider-Man-And-Venom-Maximum-Carnage.jpg',
+    plot:'Carnage escapes prison and forms a family of symbiote killers — Shriek, Doppelganger, and others — slaughtering civilians across New York. Spider-Man and Venom reluctantly team up.',
+    gameplay:'A beat-\'em-up where players switch between Spider-Man and Venom, brawling through 14 stages. Guest heroes like Captain America and Black Cat offer limited power-ups.',
+    cast:'No voice cast. Developed by Software Creations, published by Acclaim. The famous red cartridge version is iconic among collectors.'
+  },
+  {
+    id:13, year:1995, era:'90s',
+    title:'Spider-Man: The Animated Series',
+    platform:'SNES / Game Boy / Game Gear',
+    img:'https://www.gamingscan.com/wp-content/uploads/2020/09/Spider-Man-The-Animated-Series.jpg',
+    plot:'Based on the animated TV series — Spider-Man battles Mysterio, Hobgoblin, the Lizard, and the Kingpin across Manhattan in an adventure tied to the cartoon\'s storylines.',
+    gameplay:'A 2D side-scroller with web-swinging momentum mechanics. The art style closely mirrors the animated series. Players use webs offensively and for traversal.',
+    cast:'No voice cast in-game. Developed by Bits Studios, published by Acclaim.'
+  },
+  {
+    id:14, year:1995, era:'90s',
+    title:'Venom/Spider-Man: Separation Anxiety',
+    platform:'SNES / Sega Genesis',
+    img:'https://www.gamingscan.com/wp-content/uploads/2020/09/Venom-Spider-Man-Separation-Anxiety.jpg',
+    plot:'A Life Foundation splinter group captures Venom to extract five new symbiotes. Spider-Man and Venom team up again to stop these new creatures from unleashing chaos.',
+    gameplay:'A direct sequel to Maximum Carnage — another side-scrolling beat-\'em-up with two-player co-op. Players choose Spider-Man or Venom through 10 stages.',
+    cast:'No voice cast. Developed by Software Creations, published by Acclaim.'
+  },
+  {
+    id:15, year:1996, era:'90s',
+    title:'Spider-Man: Web of Fire',
+    platform:'Sega 32X',
+    img:'https://www.gamingscan.com/wp-content/uploads/2020/09/Spider-Man-Web-of-Fire.jpg',
+    plot:'HYDRA seizes control of Manhattan, cutting it off with a power grid. Spider-Man and Daredevil must tear through HYDRA agents to reclaim the city.',
+    gameplay:'A side-scrolling brawler with web-swing sections. One of only two games released for the ill-fated 32X add-on. The rarity makes it highly collectible.',
+    cast:'No voice cast. Developed and published by Sega. One of the rarest Spider-Man games ever made.'
+  },
+  {
+    id:16, year:2000, era:'00s',
+    title:'Spider-Man',
+    platform:'PS1 / N64 / Dreamcast / PC',
+    img:'https://www.gamingscan.com/wp-content/uploads/2020/09/Spider-Man-Game.jpg',
+    plot:'Doctor Octopus steals a sonic device and frames Spider-Man. Spidey must clear his name while battling Mysterio, Scorpion, Rhino, Venom, and the Symbiote Carnage.',
+    gameplay:'A groundbreaking 3D action game with free-roaming web-swinging. The first modern Spider-Man game — players swing through enclosed arenas, crawl any surface, and perform combos.',
+    cast:'Tobey Maguire voiced Spider-Man. Starring also Rino Romano, Ed Asner as J. Jonah Jameson. Developed by Neversoft, published by Activision.'
+  },
+  {
+    id:17, year:2001, era:'00s',
+    title:'Spider-Man 2: The Sinister Six',
+    platform:'Game Boy Color',
+    img:'https://www.gamingscan.com/wp-content/uploads/2020/09/Spider-Man-2-The-Sinister-Six.jpg',
+    plot:'The Sinister Six — Vulture, Electro, Sandman, Kraven, Mysterio, and Doctor Octopus — attack New York one by one. Spider-Man must stop them all.',
+    gameplay:'A top-down action game for Game Boy Color. Players navigate stages from an overhead perspective, using webs and punches to dispatch enemies.',
+    cast:'No voice cast. Developed by Torus Games, published by Activision.'
+  },
+  {
+    id:18, year:2001, era:'00s',
+    title:'Spider-Man 2: Enter Electro',
+    platform:'PlayStation',
+    img:'https://www.gamingscan.com/wp-content/uploads/2020/09/Spider-Man-2-Enter-Electro.jpg',
+    plot:'Electro seeks a device that will grant him godlike power. Spider-Man must stop him while also contending with Hammerhead, Sandman, and Shocker.',
+    gameplay:'A sequel to Neversoft\'s PS1 game, built on the same engine. New web moves and gadgets were added. Fully 3D levels with more acrobatic combat.',
+    cast:'Tobey Maguire returns as Spider-Man. Developed by Vicarious Visions, published by Activision.'
+  },
+  {
+    id:19, year:2001, era:'00s',
+    title:'Spider-Man: Mysterio\'s Menace',
+    platform:'Game Boy Advance',
+    img:'https://www.gamingscan.com/wp-content/uploads/2020/09/Spider-Man-Mysterios-Menace.jpg',
+    plot:'Mysterio is committing crimes across Manhattan using illusions and holograms. Spider-Man tracks him through several themed stages before a final showdown.',
+    gameplay:'A 2D side-scroller built specifically for the GBA launch. Features smooth animation, varied web abilities, and boss fights against Rhino, Hammerhead, and Mysterio.',
+    cast:'No voice cast. Developed by Vicarious Visions, published by Activision.'
+  },
+  {
+    id:20, year:2002, era:'00s',
+    title:'Spider-Man: The Movie',
+    platform:'PS2 / Xbox / GameCube / PC / GBA',
+    img:'https://www.gamingscan.com/wp-content/uploads/2020/09/Spider-Man-The-Movie.jpg',
+    plot:'Follows the Sam Raimi film — Peter Parker becomes Spider-Man and faces the Green Goblin, who threatens Mary Jane and the city. Original villain Shocker is also featured.',
+    gameplay:'Expanded 3D web-swinging across Manhattan. Introduced the iconic "web-zip" and aerial combat combos. The GBA version is a separate 2D game.',
+    cast:'Tobey Maguire, Willem Dafoe, Kirsten Dunst, and Bruce Campbell (narrator) reprised their film roles. Developed by Treyarch, published by Activision.'
+  },
+  {
+    id:21, year:2004, era:'00s',
+    title:'Spider-Man 2',
+    platform:'PS2 / Xbox / GameCube / PC',
+    img:'https://tse4.mm.bing.net/th/id/OIP.uCdZ7ahjJ-Uxmxe4QH-_gwHaLu?w=505&h=800&rs=1&pid=ImgDetMain&o=7&rm=3',
+    plot:'Tied to the Sam Raimi sequel — Doctor Octopus builds a miniature sun threatening New York. Spider-Man must also contend with Black Cat, Rhino, and the Shocker.',
+    gameplay:'Landmark open-world web-swinging through a fully realized Manhattan. Physics-based swinging required buildings to push off — no more infinite sky-swinging. Considered the gold standard of Spidey games for years.',
+    cast:'Tobey Maguire, Alfred Molina, Kirsten Dunst, Bruce Campbell. Developed by Treyarch, published by Activision.'
+  },
+  {
+    id:22, year:2005, era:'00s',
+    title:'Ultimate Spider-Man',
+    platform:'PS2 / Xbox / GameCube / PC / GBA / DS',
+    img:'https://www.gamingscan.com/wp-content/uploads/2020/09/Ultimate-Spider-Man.jpg',
+    plot:'Set in the Ultimate Marvel universe. Peter Parker and Eddie Brock\'s parallel stories intertwine as Venom is born and hunts Spider-Man across New York.',
+    gameplay:'Open-world Manhattan with cel-shaded comic art style by original series artists. Players switch between Spider-Man and a playable Venom, each with different mechanics.',
+    cast:'No major film actors — uses comic-style voice cast. Developed by Treyarch, published by Activision.'
+  },
+    {
+    id:23, year:2006, era:'00s',
+    title:'Spider-Man: Battle for New York',
+    platform:'GBA / DS',
+    img:'https://www.gamingscan.com/wp-content/uploads/2020/09/Spider-Man-Battle-for-New-York.jpg',
+    plot:'Set in the Ultimate Marvel universe. Peter Parker and Norman Osborn\'s parallel stories intertwine as a prequel for Ultimate Spider-Man.',
+    gameplay:'Nearly 20 linear levels representing a prequel to the 2005 Ultimate Spider-Man storyline. Players alternate between Spider-Man and Green Goblin throughout the campaign. Each level includes comic-style cutscenes',
+    cast:'No major film actors — uses comic-style voice cast. Developed by Treyarch, published by Activision.'
+  },
+  {
+    id:24, year:2007, era:'00s',
+    title:'Spider-Man 3',
+    platform:'PS3 / Xbox 360 / Wii / PS2 / PSP / DS / PC',
+    img:'https://www.gamingscan.com/wp-content/uploads/2020/09/Spider-Man-3.jpg',
+    plot:'Based on the third Raimi film. Peter deals with the alien symbiote suit while battling Sandman, Venom, New Goblin, and the Lizard in an open New York.',
+    gameplay:'Open-world with a revamped swinging system. The black suit grants extra power. Multi-platform — the PS3/360 version is most expansive; Wii gets exclusive content.',
+    cast:'Tobey Maguire, Kirsten Dunst, James Franco, Thomas Haden Church, Topher Grace. Developed by Treyarch, published by Activision.'
+  },
+  {
+    id:25, year:2007, era:'00s',
+    title:'Spider-Man: Friend or Foe',
+    platform:'PS2 / Xbox 360 / Wii / PSP / DS / PC',
+    img:'https://www.gamingscan.com/wp-content/uploads/2020/09/Spider-Man-Friend-or-Foe.jpg',
+    plot:'Mind-controlling meteor fragments fall to Earth, turning Spider-Man\'s enemies into PHANTOM agents. Spidey must recruit mind-controlled villains as allies to defeat a shadowy organization.',
+    gameplay:'A co-op beat-\'em-up with a lighter, kid-friendly tone. Players travel to global locations, fighting alongside reformed villains. Two-player co-op is the highlight.',
+    cast:'Josh Keaton as Spider-Man. Developed by Next Level Games, published by Activision.'
+  },
+  {
+    id:26, year:2008, era:'00s',
+    title:'Spider-Man: Web of Shadows',
+    platform:'PS3 / Xbox 360 / Wii / PS2 / PSP / DS / PC',
+    img:'https://www.gamingscan.com/wp-content/uploads/2020/09/Spider-Man-Web-Of-Shadows.jpg',
+    plot:'Venom infects New York with symbiotes, creating an army. Spider-Man must choose between the heroic red suit and the corrupting black symbiote suit while the city falls.',
+    gameplay:'Open-world Manhattan with a morality system — red suit vs. black suit choices affect the story. Mid-air combat, wall fights, and side missions with allies like Wolverine and Moon Knight.',
+    cast:'Josh Keaton as Spider-Man. Developed by Shaba Games (console) / Amaze Entertainment (handheld), published by Activision.'
+  },
+  {
+    id:27, year:2010, era:'10s',
+    title:'Spider-Man: Shattered Dimensions',
+    platform:'PS3 / Xbox 360 / Wii / DS / PC',
+    img:'https://www.gamingscan.com/wp-content/uploads/2020/09/Spider-Man-Shattered-Dimensions.jpg',
+    plot:'A broken tablet of chaos scatters through four parallel dimensions. Four Spider-Men — Amazing, Noir, 2099, and Ultimate — must each retrieve a fragment from iconic villains.',
+    gameplay:'Four distinct gameplay styles for four universes: acrobatic combat (Amazing), stealth (Noir), high-speed futurism (2099), and rage-powered black suit (Ultimate). Linear levels with excellent boss design.',
+    cast:'Neil Patrick Harris (Amazing), Christopher Daniel Barnes (Noir), Dan Gilvezan (2099 supporting), Josh Keaton (Ultimate). Developed by Beenox, published by Activision.'
+  },
+  {
+    id:28, year:2011, era:'10s',
+    title:'Spider-Man: Edge of Time',
+    platform:'PS3 / Xbox 360 / Wii / 3DS / DS',
+    img:'https://www.gamingscan.com/wp-content/uploads/2020/09/Spider-Man-Edge-of-Time.jpg',
+    plot:'A scientist uses time manipulation to rewrite history, causing Peter Parker\'s death in 2099 and Spider-Man 2099\'s erasure. The two Spider-Men communicate across time to fix the timeline.',
+    gameplay:'A more linear, tightly designed game than its predecessor. The two-Spider-Man dynamic creates cause-and-effect puzzles — actions in 2099 change the present immediately.',
+    cast:'Josh Keaton as Amazing Spider-Man, Christopher Daniel Barnes as Spider-Man 2099. Developed by Beenox, published by Activision.'
+  },
+  {
+    id:29, year:2012, era:'10s',
+    title:'The Amazing Spider-Man',
+    platform:'PS3 / Xbox 360 / Wii / Wii U / 3DS / DS / PC / iOS',
+    img:'https://www.gamingscan.com/wp-content/uploads/2020/09/The-Amazing-Spider-Man-Game.jpg',
+    plot:'Set after the 2012 film. Cross-Species genetic experiments go wrong at Oscorp, unleashing mutant monsters on Manhattan. Spider-Man and Dr. Connors (the Lizard) must contain the outbreak.',
+    gameplay:'Open-world Manhattan returns with a new web-rush mechanic for fast traversal. Features the Web-Ban device for combat variety. Side missions include stopping car chases and rescuing civilians.',
+    cast:'Andrew Garfield, Emma Stone, Rhys Ifans, Denis Leary reprised film roles. Developed by Beenox, published by Activision.'
+  },
+  {
+    id:30, year:2014, era:'10s',
+    title:'The Amazing Spider-Man 2',
+    platform:'PS4 / PS3 / Xbox One / Xbox 360 / Wii U / 3DS / PC / iOS',
+    img:'https://www.gamingscan.com/wp-content/uploads/2020/09/The-Amazing-Spider-Man-2-Game.jpg',
+    plot:'Peter Parker investigates a string of murders linked to a serial killer called the Carnage Killer. Meanwhile, Electro, Black Cat, and the Green Goblin threaten New York.',
+    gameplay:'Introduced a two-web-swinging mechanic requiring players to alternate left and right triggers for momentum-based traversal. Hero/Menace reputation system affects how police react to Spider-Man.',
+    cast:'Andrew Garfield, Colm Feore as Electro, Sam Claflin. Developed by Beenox, published by Activision.'
+  },
+  {
+    id:31, year:2018, era:'10s',
+    title:"Marvel's Spider-Man",
+    platform:'PS4 / PS5 (Remastered) / PC',
+    img:'https://www.gamingscan.com/wp-content/uploads/2020/09/Marvels-Spider-Man.jpg',
+    plot:'Peter Parker is 23 and experienced. When Wilson Fisk is jailed, a new villain called Mr. Negative unleashes a bioweapon and a dark secret from Norman Osborn\'s past surfaces, threatening everyone Peter loves.',
+    gameplay:'The definitive modern Spider-Man experience. Fluid open-world Manhattan with deeply satisfying web-swinging physics. Combat blends gadgets, environment, and acrobatics. Multiple suits, side missions, and an emotional story rivaling top-tier cinematic games.',
+    cast:'Yuri Lowenthal as Peter Parker/Spider-Man. Laura Bailey as Mary Jane. William Salyers as Doctor Octopus. Troy Baker as Mr. Negative. Developed by Insomniac Games, published by Sony.'
+  },
+  {
+    id:32, year:2020, era:'20s',
+    title:"Marvel's Spider-Man: Miles Morales",
+    platform:'PS5 / PS4 / PC',
+    img:'https://www.gamingscan.com/wp-content/uploads/2020/09/Marvels-Spider-Man-Miles-Morales.jpg',
+    plot:'Miles Morales steps up as Spider-Man when Peter leaves New York. An energy corporation called Roxxon and a guerilla army called the Underground clash over a powerful new energy source, threatening Harlem.',
+    gameplay:'Builds on the 2018 engine with Miles\'s unique venom powers — bio-electric stun attacks and camouflage add a fresh dimension. More intimate story. Harlem is vibrantly realized.',
+    cast:'Nadji Jeter as Miles Morales. Yuri Lowenthal returns as Peter. Developed by Insomniac Games, published by Sony.'
+  },
+  {
+    id:33, year:2023, era:'20s',
+    title:"Marvel's Spider-Man 2",
+    platform:'PS5 / PC',
+    img:'https://blog.playstation.com/uploads/2023/07/2ced6eb512213ef9452ed035f8e70128ef0817d6.jpg',
+    plot:'Peter and Miles both operate as Spider-Man. Peter bonds with the Venom symbiote, which gradually corrupts him. Meanwhile, Kraven the Hunter invades New York to find worthy prey, setting up a catastrophic collision of threats.',
+    gameplay:'The biggest entry yet — a dual open-world map covering both Manhattan and Queens/Brooklyn. Players switch between Peter and Miles fluidly. Peter\'s symbiote mechanics add brutal new combos. Web Wings allow gliding. 15–20 hour campaign.',
+    cast:'Yuri Lowenthal, Nadji Jeter, Tony Todd as Venom, Jim Pirri as Kraven. Developed by Insomniac Games, published by Sony.'
+  }
+];
+
+function toggleDetails(id){
+  const el=document.getElementById('det-'+id);
+  const btn=document.getElementById('btn-'+id);
+  if(el.classList.contains('open')){el.classList.remove('open');btn.textContent='▼ Show details';}
+  else{el.classList.add('open');btn.textContent='▲ Hide details';}
+}
+
+function filterEra(era,btn){
+  document.querySelectorAll('.era-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const cards=document.querySelectorAll('.card');
+  let count=0;
+  cards.forEach(c=>{
+    if(era==='all'||c.dataset.era===era){c.style.display='';count++;}
+    else{c.style.display='none';}
+  });
+  document.getElementById('counter').textContent='Showing '+count+' game'+(count!==1?'s':'');
+}
+
+function buildGrid(){
+  const grid=document.getElementById('grid');
+  games.forEach(g=>{
+    const card=document.createElement('div');
+    card.className='card';
+    card.dataset.era=g.era;
+    card.innerHTML=`
+      <img class="card-img" src="${g.img}" alt="${g.title}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="card-img-placeholder" style="display:none">🕷</div>
+      <div class="card-body">
+        <div class="card-header">
+          <div class="card-title">${g.title}</div>
+          <span class="year-badge">${g.year}</span>
+        </div>
+        <span class="platform-badge">${g.platform}</span>
+        <button class="expand-btn" id="btn-${g.id}" onclick="toggleDetails(${g.id})">▼ Show details</button>
+        <div class="details" id="det-${g.id}">
+          <div class="detail-section">
+            <div class="detail-label">Plot</div>
+            <div class="detail-text">${g.plot}</div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-label">Gameplay</div>
+            <div class="detail-text">${g.gameplay}</div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-label">Cast & Developer</div>
+            <div class="detail-text">${g.cast}</div>
+          </div>
+        </div>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+buildGrid();
+</script>
