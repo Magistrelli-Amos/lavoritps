@@ -118,6 +118,7 @@
             var regexLettere = /^[a-zA-Z\sàèìòùÀÈÌÒÙ]+$/;
             var regexCAP = /^[0-9]{5}$/;
             var regexEmail = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,6}$/;
+            var regexcitta = /^[0-9]{5}$/;
 
             var errore = "";
 
@@ -135,6 +136,9 @@
             }
             if (citta == "") {
                 errore += "Inserire la città. ";
+            }
+            if (!.regexcittatest(citta)) {
+                errore += "Città non valida. ";
             }
 
             if (errore !== "") {
