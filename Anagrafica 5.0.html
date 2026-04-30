@@ -84,7 +84,7 @@
         <input type="text" id="campoCognome" placeholder="Cognome (solo lettere)">
         <input type="text" id="campoEmail" placeholder="Email (es. nome@dominio.it)">
         <input type="text" id="campoCAP" placeholder="CAP (5 numeri)">
-        <input type="text" id="campoCitta" placeholder="Città">
+        <input type="text" id="campoCitta" placeholder="Città (solo lettere)">
 
         <button onclick="salvaDati()">Invia Dati</button>
     </div>
@@ -133,8 +133,9 @@
             if (!regexCAP.test(cap)) {
                 errore += "CAP deve contenere 5 numeri. ";
             }
-            if (citta == "") {
-                errore += "Inserire la città. ";
+            // MODIFICA QUI: Controllo lettere per la città invece del solo controllo vuoto
+            if (!regexLettere.test(citta)) {
+                errore += "Città non valida (usa solo lettere). ";
             }
 
             if (errore !== "") {
