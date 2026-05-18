@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Russian Roulette</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Courier+Prime:wght@400;700&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #F5F3EE;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: 'Courier Prime', monospace;
+      color: #3A3935;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 14px;
+      font-weight: 400;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #9A9890;
+      margin-bottom: 40px;
+    }
+
+    canvas {
+      display: block;
+      margin: 0 auto;
+    }
+
+    .dots {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin: 20px 0 10px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 1px solid #B4B2A9;
+      background: transparent;
+      transition: background 0.25s;
+    }
+
+    .dot.current {
+      border-color: #A32D2D;
+      background: #A32D2D;
+    }
+
+    .dot.fired {
+      background: #C8C6BE;
+      border-color: #C8C6BE;
+    }
+
+    #message {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      text-align: center;
+      min-height: 34px;
+      margin: 16px 0 28px;
+      color: #9A9890;
+      transition: color 0.3s;
+    }
+
+    #message.dead  { color: #A32D2D; }
+    #message.alive { color: #3A3935; }
+
+    .buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    button {
+      font-family: 'Courier Prime', monospace;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 10px 28px;
+      border: 1px solid #C8C6BE;
+      background: transparent;
+      color: #3A3935;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    button:hover {
+      background: #ECEAE3;
+    }
+
+    #fireBtn {
+      border-color: #A32D2D;
+      color: #A32D2D;
+    }
+
+    #fireBtn:hover {
+      background: #FCEBEB;
+    }
+
+    #roundInfo {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      color: #B4B2A9;
+      text-transform: uppercase;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Russian Roulette</h1>
+
+  <canvas id="c" width="320" height="320"></canvas>
+
+  <div class="dots" id="dots"></div>
+
+  <div id="message">Gira il tamburo, poi spara.</div>
+
+  <div class="buttons">
+    <button id="spinBtn" onclick="spin()">Gira</button>
+    <button id="fireBtn" onclick="fire()">Spara</button>
+    <button id="resetBtn" onclick="resetGame()">Reset</button>
+  </div>
+
+  <div id="roundInfo">Colpo 0 / 6</div>
+
+<script>
+  var CHAMBERS = 6;
+  var canvas   = document.getElementById('c');
+  var ctx      = canvas.getContext('2d');
+
+  var bulletPos      = 0;
+  var currentChamber = 0;
+  var shotsFired     = 0;
+  var gameOver       = false;
+  var cylinderAngle  = 0;
+  var targetAngle    = 0;
+  var isSpinning     = false;
+  var recoilY        = 0;
+  var spinInterval   = null;
+  var recoilStep     = 0;
+  var recoilInterval = null;
+  var firedList      = [];   // array di 'ok' o 'dead' per ogni colpo
+
+  function resetGame() {
+    bulletPos      = Math.floor(Math.random() * CHAMBERS);
+    currentChamber = 0;
+    shotsFired     = 0;
+    gameOver       = false;
+    cylinderAngle  = 0;
+    targetAngle    = 0;
+    isSpinning     = false;
+    recoilY        = 0;
+    firedList      = [];
+    if (spinInterval)   clearInterval(spinInterval);
+    if (recoilInterval) clearInterval(recoilInterval);
+    setMessage('Gira il tamburo, poi spara.', '');
+    document.getElementById('roundInfo').textContent = 'Colpo 0 / 6';
+    renderDots();
+    draw();
+  }
+
+  function spin() {
+    if (isSpinning || gameOver) return;
+    currentChamber = Math.floor(Math.random() * CHAMBERS);
+    var spins      = 3 + Math.floor(Math.random() * 3);
+    var extra      = (currentChamber / CHAMBERS) * 360;
+    targetAngle    = cylinderAngle + spins * 360 + extra;
+    isSpinning     = true;
+    setMessage('Il tamburo gira...', '');
+
+    spinInterval = setInterval(function() {
+      var diff = targetAngle - cylinderAngle;
+      if (diff < 1) {
+        cylinderAngle = targetAngle % 360;
+        isSpinning    = false;
+        clearInterval(spinInterval);
+        setMessage('Pronto. Spara quando vuoi.', '');
+        renderDots();
+      } else {
+        cylinderAngle += diff * 0.08 + 0.5;
+      }
+      draw();
+    }, 16);
+  }
+
+  function fire() {
+    if (isSpinning || gameOver) return;
+    shotsFired++;
+    startRecoil();
+
+    var hit = (currentChamber === bulletPos);
+
+    setTimeout(function() {
+      if (hit) {
+        firedList.push('dead');
+        gameOver = true;
+        setMessage('Colpo fatale', 'dead');
+      } else {
+        firedList.push('ok');
+        if (shotsFired >= CHAMBERS) {
+          gameOver = true;
+          setMessage('Sei sopravvissuto!', 'alive');
+        } else {
+          setMessage('Scatto a vuoto. Continua...', '');
+          currentChamber = (currentChamber + 1) % CHAMBERS;
+        }
+      }
+      document.getElementById('roundInfo').textContent = 'Colpo ' + shotsFired + ' / 6';
+      renderDots();
+      draw();
+    }, 220);
+  }
+
+  function startRecoil() {
+    recoilStep = 0;
+    if (recoilInterval) clearInterval(recoilInterval);
+    recoilInterval = setInterval(function() {
+      recoilStep++;
+      if      (recoilStep < 5)  recoilY = recoilStep * 3;
+      else if (recoilStep < 13) recoilY = (13 - recoilStep) * 2;
+      else {
+        recoilY = 0;
+        clearInterval(recoilInterval);
+      }
+      draw();
+    }, 16);
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    var cx = canvas.width  / 2;
+    var cy = canvas.height / 2 + recoilY;
+    var R  = 110;
+    var cr = 24;
+    var orbitR = R - cr - 12;
+
+    // Cerchio esterno
+    ctx.beginPath();
+    ctx.arc(cx, cy, R, 0, Math.PI * 2);
+    ctx.strokeStyle = '#D3D1C7';
+    ctx.lineWidth   = 1;
+    ctx.stroke();
+
+    // Indicatore martello
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - R - 12);
+    ctx.lineTo(cx, cy - R + 5);
+    ctx.strokeStyle = '#A32D2D';
+    ctx.lineWidth   = 2;
+    ctx.stroke();
+
+    // Camere
+    for (var i = 0; i < CHAMBERS; i++) {
+      var a  = toRad(cylinderAngle + (i / CHAMBERS) * 360 - 90);
+      var px = cx + Math.cos(a) * orbitR;
+      var py = cy + Math.sin(a) * orbitR;
+      var isCurrent = (i === currentChamber);
+      var hasBullet = (i === bulletPos);
+
+      // Sfondo camera
+      ctx.beginPath();
+      ctx.arc(px, py, cr, 0, Math.PI * 2);
+      ctx.fillStyle = isCurrent ? '#ECE9E1' : '#E0DED6';
+      ctx.fill();
+
+      // Bordo camera
+      ctx.beginPath();
+      ctx.arc(px, py, cr, 0, Math.PI * 2);
+      if (isCurrent) {
+        ctx.strokeStyle = '#A32D2D';
+        ctx.lineWidth   = 2;
+      } else {
+        ctx.strokeStyle = '#B4B2A9';
+        ctx.lineWidth   = 0.8;
+      }
+      ctx.stroke();
+
+      // Mostra la pallottola solo a fine partita
+      if (hasBullet && gameOver) {
+        ctx.beginPath();
+        ctx.arc(px, py, cr * 0.48, 0, Math.PI * 2);
+        ctx.fillStyle = '#5F5E5A';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(px, py, cr * 0.22, 0, Math.PI * 2);
+        ctx.fillStyle = '#BA7517';
+        ctx.fill();
+      }
+    }
+
+    // Perno centrale
+    ctx.beginPath();
+    ctx.arc(cx, cy, 10, 0, Math.PI * 2);
+    ctx.fillStyle = '#B4B2A9';
+    ctx.fill();
+  }
+
+  function toRad(deg) {
+    return deg * Math.PI / 180;
+  }
+
+  function setMessage(text, cls) {
+    var el = document.getElementById('message');
+    el.textContent = text;
+    el.className   = cls;
+  }
+
+  function renderDots() {
+    var wrap = document.getElementById('dots');
+    wrap.innerHTML = '';
+    for (var i = 0; i < CHAMBERS; i++) {
+      var d = document.createElement('div');
+      d.className = 'dot';
+      wrap.appendChild(d);
+    }
+    // Segna i colpi sparati prima di quello corrente
+    for (var s = 0; s < firedList.length; s++) {
+      var idx = (currentChamber - firedList.length + s + CHAMBERS) % CHAMBERS;
+      wrap.children[idx].classList.add('fired');
+    }
+    // Camera corrente
+    if (!gameOver) {
+      wrap.children[currentChamber].classList.add('current');
+    }
+  }
+
+  // Avvio
+  resetGame();
+</script>
+</body>
+</html>
