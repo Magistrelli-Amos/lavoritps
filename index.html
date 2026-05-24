@@ -1,229 +1,203 @@
 <!DOCTYPE html>
 <html lang="it">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Catalogo</title>
-  <link rel="stylesheet" href="store.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lavori</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-<!-- NAVBAR -->
-<nav class="navbar">
-  <div class="navbar-inner">
-    <a href="index.html" class="brand">
-      <img src="" class="store-logo" onerror="this.style.display='none'" alt="">
-      <div class="brand-text">
-        <span class="store-name">My Store</span>
-        <span class="store-tagline"></span>
-      </div>
-    </a>
-    <div class="nav-links">
-      <a href="index.html" class="active"><span>🏠</span> <span>Catalogo</span></a>
-      <a href="cart.html" class="cart-btn">
-        <span>🛒</span> <span>Carrello</span>
-        <span id="cart-badge" style="display:none;"></span>
-      </a>
-      <a href="ini.html"><span>⚙️</span> <span>Config</span></a>
+      :root {
+        --bg: #ff4f4f;
+        --surface: rgba(255,255,255,0.45);
+        --border: rgba(255,255,255,0.5);
+        --border-hover: rgba(255,255,255,0.85);
+        --text-primary: #1e0f33;
+        --text-secondary: #090ead;
+        --accent: #09f5f5;
+      }
+
+      body {
+        background-color: var(--bg);
+        font-family: 'Inter', sans-serif;
+        font-weight: 400;
+        color: var(--text-primary);
+        min-height: 100vh;
+        padding: 80px 24px 100px;
+        transition: background-color 1.4s ease;
+      }
+
+      body.shiny {
+        --bg: #64ccf3;
+        --surface: rgba(255,255,255,0.45);
+        --border: rgba(255,255,255,0.5);
+        --border-hover: rgba(255,255,255,0.85);
+        --text-primary: #002f44;
+        --text-secondary: #1a6a8a;
+        --accent: #004e72;
+      }
+
+      .flash {
+        position: fixed; inset: 0;
+        background: white; opacity: 0;
+        pointer-events: none; z-index: 999;
+      }
+      .flash.active { animation: flash 0.8s ease forwards; }
+      @keyframes flash {
+        0%   { opacity: 0; }
+        15%  { opacity: 0.85; }
+        40%  { opacity: 0; }
+        55%  { opacity: 0.4; }
+        100% { opacity: 0; }
+      }
+
+      .container {
+        max-width: 520px;
+        margin: 0 auto;
+      }
+
+      header {
+        margin-bottom: 48px;
+      }
+
+      .wordmark {
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+      }
+
+      .divider {
+        width: 32px;
+        height: 1px;
+        background: var(--text-secondary);
+        opacity: 0.35;
+        margin: 20px 0;
+      }
+
+      .section-label {
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+        margin-bottom: 20px;
+      }
+
+      .list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .list-item a {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 18px;
+        background: var(--surface);
+        border: 0.5px solid var(--border);
+        border-radius: 10px;
+        text-decoration: none;
+        color: var(--text-primary);
+        font-size: 14px;
+        font-weight: 400;
+        backdrop-filter: blur(6px);
+        transition: border-color 0.15s, transform 0.15s, background 0.15s;
+      }
+
+      .list-item a:hover {
+        border-color: var(--border-hover);
+        background: rgba(255,255,255,0.6);
+        transform: translateX(3px);
+      }
+
+      .item-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .item-dot {
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: var(--text-secondary);
+        opacity: 0.5;
+        flex-shrink: 0;
+        transition: opacity 0.15s, background 0.15s;
+      }
+
+      .list-item a:hover .item-dot {
+        opacity: 1;
+        background: var(--accent);
+      }
+
+      .item-arrow {
+        font-size: 13px;
+        color: var(--text-secondary);
+        opacity: 0;
+        transition: opacity 0.15s, transform 0.15s;
+      }
+
+      .list-item a:hover .item-arrow {
+        opacity: 1;
+        transform: translateX(2px);
+      }
+
+      .list-item.wip a { opacity: 0.4; }
+
+      footer {
+        margin-top: 64px;
+        font-size: 11px;
+        color: var(--text-secondary);
+        opacity: 0.6;
+        letter-spacing: 0.08em;
+      }
+
+      @media (max-width: 480px) {
+        body { padding: 48px 16px 80px; }
+        .list-item a { padding: 13px 14px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="flash" id="flash"></div>
+
+    <div class="container">
+      <header>
+        <div class="wordmark">Lavori</div>
+        <div class="divider"></div>
+        <div class="section-label">Projects</div>
+      </header>
+
+      <ul class="list">
+        <li class="list-item"><a href="https://magistrelli-amos.github.io/lavoritps/Anagrafica Utente.html"><div class="item-left"><span class="item-dot"></span><span>Anagrafica 1.0</span></div><span class="item-arrow">→</span></a></li>
+        <li class="list-item"><a href="https://magistrelli-amos.github.io/lavoritps/Anagrafica2.0.html"><div class="item-left"><span class="item-dot"></span><span>Anagrafica 2.0</span></div><span class="item-arrow">→</span></a></li>
+        <li class="list-item"><a href="https://magistrelli-amos.github.io/lavoritps/anagrafica_3.0.html"><div class="item-left"><span class="item-dot"></span><span>Anagrafica 3.0</span></div><span class="item-arrow">→</span></a></li>
+        <li class="list-item"><a href="https://magistrelli-amos.github.io/lavoritps/Anagrafica 5.0.html"><div class="item-left"><span class="item-dot"></span><span>Anagrafica 5.0</span></div><span class="item-arrow">→</span></a></li>
+        <li class="list-item"><a href="https://magistrelli-amos.github.io/lavoritps/Calcolatrice.html"><div class="item-left"><span class="item-dot"></span><span>Calcolatrice</span></div><span class="item-arrow">→</span></a></li>
+        <li class="list-item"><a href="https://magistrelli-amos.github.io/lavoritps/Conversore Decimale-Binario.html"><div class="item-left"><span class="item-dot"></span><span>Conversore Decimale-Binario</span></div><span class="item-arrow">→</span></a></li>
+         <li class="list-item"><a href="https://magistrelli-amos.github.io/lavoritps/TASM3_fansite.html"><div class="item-left"><span class="item-dot"></span><span>The Amazing Spider-Man 3</span></div><span class="item-arrow">→</span></a></li>
+        <li class="list-item"><a href="https://magistrelli-amos.github.io/lavoritps/spiderman_games_encyclopedia.html"><div class="item-left"><span class="item-dot"></span><span>Enciclopedia Giochi di SM</span></div><span class="item-arrow">→</span></a></li>
+        <li class="list-item"><a href="https://magistrelli-amos.github.io/lavoritps/biotecnologie-neurotecnologie.html"><div class="item-left"><span class="item-dot"></span><span>Biotecnologie e Neurotecnologie</span></div><span class="item-arrow">→</span></a></li>
+         <li class="list-item"><a href="https://magistrelli-amos.github.io/lavoritps/roulette.html"><div class="item-left"><span class="item-dot"></span><span>Roulette Russa</span></div><span class="item-arrow">→</span></a></li>
+      </ul>
+
+      <footer>Magistrelli-Amos · github.io</footer>
     </div>
-  </div>
-</nav>
 
-<!-- HERO -->
-<div class="page-hero" id="page-hero">
-  <h1 class="store-name">My Store</h1>
-  <p class="store-tagline"></p>
-</div>
-
-<!-- MAIN -->
-<div class="container">
-
-  <!-- NO CONFIG ALERT -->
-  <div id="no-config" style="display:none; text-align:center; padding:80px 24px;">
-    <div style="font-size:4rem;margin-bottom:16px;">📂</div>
-    <h2 style="font-family:var(--font-display);font-size:1.8rem;margin-bottom:10px;">Nessun catalogo configurato</h2>
-    <p style="color:var(--text-muted);margin-bottom:24px;">Carica il tuo file CSV dalla pagina di configurazione per visualizzare i prodotti.</p>
-    <a href="ini.html" class="btn btn-primary btn-lg">⚙️ Configura il negozio</a>
-  </div>
-
-  <!-- FILTERS -->
-  <div class="filters-bar" id="filters-bar" style="display:none;">
-    <div class="search-box">
-      <svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" id="search-input" placeholder="Cerca prodotti…" oninput="filterProducts()">
-    </div>
-    <select class="filter-select" id="brand-filter" onchange="filterProducts()">
-      <option value="">Tutte le marche</option>
-    </select>
-    <select class="filter-select" id="sort-select" onchange="filterProducts()">
-      <option value="">Ordine: predefinito</option>
-      <option value="price-asc">Prezzo: crescente</option>
-      <option value="price-desc">Prezzo: decrescente</option>
-      <option value="name-asc">Nome: A-Z</option>
-      <option value="name-desc">Nome: Z-A</option>
-    </select>
-    <span class="results-count" id="results-count"></span>
-  </div>
-
-  <!-- GRID -->
-  <div class="product-grid" id="product-grid"></div>
-
-</div>
-
-<div class="toast-container" id="toast-container"></div>
-
-<script src="store.js"></script>
-<script>
-let allProducts = [];
-let cfg = {};
-
-async function init() {
-  cfg = getConfig();
-  if (!cfg.csvData) {
-    document.getElementById('no-config').style.display = 'block';
-    document.getElementById('filters-bar').style.display = 'none';
-    return;
-  }
-
-  allProducts = parseCSV(cfg.csvData);
-
-  // Apply column mapping
-  if (cfg.mapping) {
-    allProducts = allProducts.map(p => remapProduct(p, cfg.mapping));
-  }
-
-  if (allProducts.length === 0) {
-    document.getElementById('no-config').style.display = 'block';
-    return;
-  }
-
-  document.getElementById('filters-bar').style.display = 'flex';
-  populateBrandFilter();
-  renderProducts(allProducts);
-}
-
-function remapProduct(p, mapping) {
-  const result = { ...p };
-  Object.entries(mapping).forEach(([stdKey, csvKey]) => {
-    if (csvKey && csvKey !== stdKey && p[csvKey] !== undefined) {
-      result[stdKey] = p[csvKey];
-    }
-  });
-  return result;
-}
-
-function populateBrandFilter() {
-  const brands = [...new Set(allProducts.map(p => p.marca).filter(Boolean))].sort();
-  const sel = document.getElementById('brand-filter');
-  brands.forEach(b => {
-    const opt = document.createElement('option');
-    opt.value = b;
-    opt.textContent = b;
-    sel.appendChild(opt);
-  });
-}
-
-function filterProducts() {
-  const q = document.getElementById('search-input').value.toLowerCase();
-  const brand = document.getElementById('brand-filter').value;
-  const sort = document.getElementById('sort-select').value;
-
-  let filtered = allProducts.filter(p => {
-    const matchQ = !q ||
-      (p.marca || '').toLowerCase().includes(q) ||
-      (p.modello || '').toLowerCase().includes(q) ||
-      (p.descrizione || '').toLowerCase().includes(q);
-    const matchBrand = !brand || p.marca === brand;
-    return matchQ && matchBrand;
-  });
-
-  if (sort === 'price-asc') filtered.sort((a,b) => parsePrice(a.prezzo) - parsePrice(b.prezzo));
-  else if (sort === 'price-desc') filtered.sort((a,b) => parsePrice(b.prezzo) - parsePrice(a.prezzo));
-  else if (sort === 'name-asc') filtered.sort((a,b) => (a.modello||'').localeCompare(b.modello||''));
-  else if (sort === 'name-desc') filtered.sort((a,b) => (b.modello||'').localeCompare(a.modello||''));
-
-  renderProducts(filtered);
-}
-
-function renderProducts(products) {
-  const grid = document.getElementById('product-grid');
-  const count = document.getElementById('results-count');
-  const currency = cfg.currency || '€';
-  const labels = cfg.labels || {};
-
-  count.textContent = `${products.length} prodott${products.length === 1 ? 'o' : 'i'}`;
-
-  if (products.length === 0) {
-    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 24px;color:var(--text-muted);">
-      <div style="font-size:3rem;margin-bottom:12px;">🔍</div>
-      <h3 style="font-family:var(--font-display);margin-bottom:6px;">Nessun prodotto trovato</h3>
-      <p>Prova a modificare la ricerca o i filtri.</p>
-    </div>`;
-    return;
-  }
-
-  grid.innerHTML = products.map((p, i) => {
-    const price = parsePrice(p.prezzo);
-    const priceStr = price > 0 ? formatPrice(price, currency) : (p.prezzo || 'N/D');
-    const imgUrl = p.immagine || '';
-    const delay = Math.min(i * 60, 600);
-
-    return `
-    <div class="product-card" style="animation-delay:${delay}ms" onclick="openProduct(${i})">
-      <div class="card-img-wrap">
-        ${imgUrl
-          ? `<img src="${escHtml(imgUrl)}" alt="${escHtml(p.modello||'')}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
-          : ''}
-        <div class="card-img-placeholder" style="display:${imgUrl?'none':'flex'};align-items:center;justify-content:center;width:100%;height:100%">🛍️</div>
-      </div>
-      <div class="card-body">
-        <div class="card-brand">${escHtml(p.marca || '')}</div>
-        <div class="card-title">${escHtml(p.modello || '')}</div>
-        <div class="card-desc">${escHtml(p.descrizione || '')}</div>
-      </div>
-      <div class="card-footer">
-        <span class="card-price">${escHtml(priceStr)}</span>
-        <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();quickAdd(${i})">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-          Aggiungi
-        </button>
-      </div>
-    </div>`;
-  }).join('');
-
-  // Store reference for quickAdd by index
-  window._filteredProducts = products;
-}
-
-function openProduct(index) {
-  const p = window._filteredProducts[index];
-  if (!p) return;
-  // encode product as base64 in URL param
-  const encoded = btoa(encodeURIComponent(JSON.stringify(p)));
-  window.location.href = `product.html?d=${encoded}`;
-}
-
-function quickAdd(index) {
-  const p = window._filteredProducts[index];
-  if (!p) return;
-  addToCart(p, 1);
-  showToast(`✅ "${p.modello}" aggiunto al carrello!`, 'success');
-}
-
-function escHtml(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function showToast(msg, type = '') {
-  const c = document.getElementById('toast-container');
-  const t = document.createElement('div');
-  t.className = 'toast ' + type;
-  t.textContent = msg;
-  c.appendChild(t);
-  setTimeout(() => t.remove(), 3000);
-}
-
-init();
-</script>
-</body>
+    <script>
+      if (Math.random() < 1 / 4096) {
+        const flash = document.getElementById('flash');
+        flash.classList.add('active');
+        setTimeout(() => {
+          document.body.classList.add('shiny');
+          flash.classList.remove('active');
+        }, 420);
+      }
+    </script>
+  </body>
 </html>
