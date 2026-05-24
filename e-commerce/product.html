@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dettaglio Prodotto</title>
+  <link rel="stylesheet" href="store.css">
+  <style>
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      font-weight: 500;
+      text-decoration: none;
+      padding: 8px 4px;
+      border-radius: 8px;
+      transition: var(--transition);
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+    .back-btn:hover { color: var(--accent); }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+
+    .related-section {
+      max-width: 1100px;
+      margin: 0 auto 60px;
+      padding: 0 24px;
+    }
+
+    .related-section h2 {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 20px;
+      color: var(--text);
+    }
+
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 18px;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1.5px solid var(--border);
+      margin: 0;
+    }
+
+    .badge-tag {
+      display: inline-block;
+      background: rgba(15,52,96,0.07);
+      color: var(--accent);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.04em;
+    }
+
+    .add-feedback {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #16a34a;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      animation: fadeInUp 0.3s ease;
+    }
+
+    @media (max-width: 700px) {
+      .product-detail { grid-template-columns: 1fr; gap: 24px; margin-top: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a href="index.html" class="brand">
+      <img src="" class="store-logo" onerror="this.style.display='none'" alt="">
+      <div class="brand-text">
+        <span class="store-name">My Store</span>
+        <span class="store-tagline"></span>
+      </div>
+    </a>
+    <div class="nav-links">
+      <a href="index.html"><span>🏠</span> <span>Catalogo</span></a>
+      <a href="cart.html" class="cart-btn">
+        <span>🛒</span> <span>Carrello</span>
+        <span id="cart-badge" style="display:none;"></span>
+      </a>
+      <a href="ini.html"><span>⚙️</span> <span>Config</span></a>
+    </div>
+  </div>
+</nav>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <a href="index.html">🏠 Catalogo</a>
+  <span>›</span>
+  <span id="bc-brand"></span>
+  <span>›</span>
+  <strong id="bc-model"></strong>
+</div>
+
+<hr class="divider">
+
+<!-- PRODUCT DETAIL -->
+<div class="product-detail" id="product-detail">
+  <!-- Loaded by JS -->
+</div>
+
+<hr class="divider" style="max-width:1100px;margin:0 auto;">
+
+<!-- RELATED PRODUCTS -->
+<div class="related-section">
+  <h2 id="related-title" style="display:none;">Altri prodotti dello stesso brand</h2>
+  <div class="related-grid" id="related-grid"></div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script src="store.js"></script>
+<script>
+let product = null;
+let allProducts = [];
+let cfg = {};
+
+function escHtml(str) {
+  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function init() {
+  cfg = getConfig();
+  const params = new URLSearchParams(location.search);
+  const encoded = params.get('d');
+
+  if (!encoded) {
+    document.getElementById('product-detail').innerHTML = '<p style="padding:40px;color:var(--text-muted)">Prodotto non trovato. <a href="index.html">Torna al catalogo</a></p>';
+    return;
+  }
+
+  try {
+    product = JSON.parse(decodeURIComponent(atob(encoded)));
+  } catch {
+    document.getElementById('product-detail').innerHTML = '<p style="padding:40px;color:var(--text-muted)">Errore nel caricamento. <a href="index.html">Torna al catalogo</a></p>';
+    return;
+  }
+
+  // Breadcrumb
+  document.getElementById('bc-brand').textContent = product.marca || '';
+  document.getElementById('bc-model').textContent = product.modello || '';
+  document.title = (product.modello || 'Prodotto') + ' — ' + (cfg.storeName || 'Store');
+
+  // Load all products for related
+  if (cfg.csvData) {
+    allProducts = parseCSV(cfg.csvData);
+    if (cfg.mapping) allProducts = allProducts.map(p => remapProduct(p, cfg.mapping));
+  }
+
+  renderProduct();
+  renderRelated();
+}
+
+function remapProduct(p, mapping) {
+  const result = { ...p };
+  Object.entries(mapping).forEach(([stdKey, csvKey]) => {
+    if (csvKey && csvKey !== stdKey && p[csvKey] !== undefined) result[stdKey] = p[csvKey];
+  });
+  return result;
+}
+
+function renderProduct() {
+  const currency = cfg.currency || '€';
+  const labels = cfg.labels || {};
+  const price = parsePrice(product.prezzo);
+  const priceStr = price > 0 ? formatPrice(price, currency) : (product.prezzo || 'N/D');
+
+  // Build extra fields (any column beyond the 5 standard ones)
+  const stdCols = new Set(['marca','modello','descrizione','immagine','prezzo']);
+  const extraFields = Object.entries(product).filter(([k]) => !stdCols.has(k) && k && product[k]);
+
+  const extraRows = extraFields.map(([k, v]) => `
+    <tr>
+      <th>${escHtml(labels[k] || k.charAt(0).toUpperCase() + k.slice(1))}</th>
+      <td>${escHtml(v)}</td>
+    </tr>`).join('');
+
+  document.getElementById('product-detail').innerHTML = `
+    <!-- GALLERY -->
+    <div class="product-gallery">
+      ${product.immagine
+        ? `<img src="${escHtml(product.immagine)}" alt="${escHtml(product.modello||'')}" onerror="this.outerHTML='<div style=\\'font-size:5rem;opacity:.2;margin:auto\\'>🛍️</div>'">`
+        : '<div style="font-size:5rem;opacity:.2;margin:auto">🛍️</div>'}
+    </div>
+
+    <!-- INFO -->
+    <div class="product-info">
+      <button class="back-btn" onclick="history.back()">
+        ← Torna al catalogo
+      </button>
+
+      <div><span class="product-brand-badge">${escHtml(product.marca || '')}</span></div>
+
+      <h1 class="product-title">${escHtml(product.modello || '')}</h1>
+
+      <p class="product-desc">${escHtml(product.descrizione || '')}</p>
+
+      <div class="product-price-block">
+        <div>
+          <div style="font-size:.8rem;opacity:.7;margin-bottom:2px;">Prezzo</div>
+          <div class="product-price">${escHtml(priceStr)}</div>
+        </div>
+        <span class="badge-tag" style="background:rgba(255,255,255,.15);color:#fff;">IVA incl.</span>
+      </div>
+
+      <!-- QTY + ADD -->
+      <div class="product-actions">
+        <div class="qty-control">
+          <button onclick="changeQty(-1)">−</button>
+          <input type="number" id="qty-input" value="1" min="1" max="99">
+          <button onclick="changeQty(1)">+</button>
+        </div>
+        <button class="btn btn-primary btn-lg" id="add-btn" onclick="addProductToCart()">
+          🛒 Aggiungi al carrello
+        </button>
+        <a href="cart.html" class="btn btn-outline btn-lg">Vai al carrello →</a>
+      </div>
+
+      <!-- META TABLE -->
+      ${extraRows || price > 0 ? `
+      <div>
+        <div class="section-label">Specifiche</div>
+        <table class="product-meta-table">
+          <tr><th>${labels.marca || 'Marca'}</th><td>${escHtml(product.marca||'')}</td></tr>
+          <tr><th>${labels.modello || 'Modello'}</th><td>${escHtml(product.modello||'')}</td></tr>
+          ${extraRows}
+        </table>
+      </div>` : ''}
+
+    </div>
+  `;
+}
+
+function changeQty(delta) {
+  const input = document.getElementById('qty-input');
+  const val = Math.max(1, Math.min(99, parseInt(input.value || 1) + delta));
+  input.value = val;
+}
+
+function addProductToCart() {
+  const qty = parseInt(document.getElementById('qty-input').value) || 1;
+  addToCart(product, qty);
+  const btn = document.getElementById('add-btn');
+  btn.innerHTML = '✅ Aggiunto!';
+  btn.style.background = '#16a34a';
+  setTimeout(() => {
+    btn.innerHTML = '🛒 Aggiungi al carrello';
+    btn.style.background = '';
+  }, 2000);
+  showToast(`✅ "${product.modello}" ×${qty} nel carrello!`, 'success');
+}
+
+function renderRelated() {
+  const related = allProducts.filter(p =>
+    p.marca === product.marca &&
+    p.modello !== product.modello
+  ).slice(0, 4);
+
+  if (related.length === 0) return;
+
+  const currency = cfg.currency || '€';
+  document.getElementById('related-title').style.display = 'block';
+
+  document.getElementById('related-grid').innerHTML = related.map(p => {
+    const price = parsePrice(p.prezzo);
+    const priceStr = price > 0 ? formatPrice(price, currency) : (p.prezzo || '');
+    const encoded = btoa(encodeURIComponent(JSON.stringify(p)));
+    return `
+    <div class="product-card" onclick="window.location.href='product.html?d=${encoded}'">
+      <div class="card-img-wrap">
+        ${p.immagine
+          ? `<img src="${escHtml(p.immagine)}" alt="${escHtml(p.modello||'')}" loading="lazy" onerror="this.style.display='none'">`
+          : '<div class="card-img-placeholder" style="display:flex;align-items:center;justify-content:center;width:100%;height:100%">🛍️</div>'}
+      </div>
+      <div class="card-body">
+        <div class="card-brand">${escHtml(p.marca||'')}</div>
+        <div class="card-title">${escHtml(p.modello||'')}</div>
+        <div class="card-desc">${escHtml(p.descrizione||'')}</div>
+      </div>
+      <div class="card-footer">
+        <span class="card-price">${escHtml(priceStr)}</span>
+        <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();quickRelatedAdd(${JSON.stringify(escHtml(btoa(encodeURIComponent(JSON.stringify(p)))))})">+ Aggiungi</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function quickRelatedAdd(encoded) {
+  try {
+    const p = JSON.parse(decodeURIComponent(atob(encoded)));
+    addToCart(p, 1);
+    showToast(`✅ "${p.modello}" aggiunto!`, 'success');
+  } catch {}
+}
+
+function showToast(msg, type = '') {
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+init();
+</script>
+</body>
+</html>
